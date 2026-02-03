@@ -1,7 +1,14 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+from dotenv import load_dotenv
 
-MONGO_URI = os.getenv("mongodb+srv://mithulkannan5_db_user:Mithulkannan@new.5vp1oyk.mongodb.net/?appName=New")
+
+load_dotenv()
+
+MONGO_URI = os.getenv("MONGO_URI")
+
+if not MONGO_URI:
+    raise ValueError("No MONGO_URI found in environment variables")
 
 client = AsyncIOMotorClient(MONGO_URI)
 db = client["ai_support_platform"]
