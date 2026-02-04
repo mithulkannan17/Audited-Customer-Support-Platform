@@ -3,6 +3,8 @@ from app.db import tickets_col
 from app.models.ticket import SupportTicket
 from app.models.event import ConversationEvent
 from app.services.event_logger import log_event
+from app.services.quality_engine import run_quality_checks
+
 
 router = APIRouter()
 
@@ -19,5 +21,25 @@ async def create_ticket(ticket: SupportTicket):
     )
 
     return ticket
+
+@router.post("/tickets/{ticket_id}/close")
+async def close_ticket(ticket_id: str):
+    await tickets_col.update_one(
+        {"id": ticket_id},
+        {"$set": {"status": "PROVISIONALLY_RESOLVED"}}
+    )
+
+    await log_event(
+        ConversationEvent(
+            Conversation_id=ticket_id,
+            event_type="TICKET_PROVISIONALLY_RESOLVED",
+            payload={}
+        )
+    )
+
+    # Run quality intelligence AFTER closure
+    await run_quality_checks(ticket_id)
+
+    return {"status": "provisionally_resolved"}
 
 
