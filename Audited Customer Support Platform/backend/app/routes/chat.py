@@ -16,7 +16,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
             # Log user message
             await log_event(
                 ConversationEvent(
-                    Conversation_id=ticket_id,
+                    conversation_id=ticket_id,
                     event_type="USER_MESSAGE",
                     payload={"text": user_message}
                 )
@@ -26,7 +26,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
             if user_message.lower() in ["human", "manager", "stop"]:
                 await log_event(
                     ConversationEvent(
-                        Conversation_id=ticket_id,
+                        conversation_id=ticket_id,
                         event_type="EXPLICIT_ESCALATION",
                         payload={"trigger": user_message}
                     )
@@ -43,7 +43,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
 
             await log_event(
                 ConversationEvent(
-                    Conversation_id=ticket_id,
+                    conversation_id=ticket_id,
                     event_type="AGENT_CONFIDENCE",
                     payload={
                         "confidence": 0.42,
@@ -55,7 +55,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
             # agent assumption
             await log_event(
                 ConversationEvent(
-                    Conversation_id=ticket_id,
+                    conversation_id=ticket_id,
                     event_type="AGENT_ASSUMPTION",
                     payload={
                         "assumed_intent": "order_delivery_issue",
@@ -68,7 +68,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
             # Log agent messsage
             await log_event(
                 ConversationEvent(
-                    Conversation_id=ticket_id,
+                    conversation_id=ticket_id,
                     event_type="AGENT_MESSAGE",
                     payload={"text": agent_reply}
                 )
@@ -79,7 +79,7 @@ async def chat_socket(websocket: WebSocket, ticket_id: str):
     except WebSocketDisconnect:
         await log_event(
             ConversationEvent(
-                Conversation_id=ticket_id,
+                conversation_id=ticket_id,
                 event_type="CONNECTION_CLOSED",
                 payload={"timestamp": datetime.utcnow().isoformat()}
             )

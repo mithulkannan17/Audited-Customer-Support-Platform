@@ -17,3 +17,9 @@ products_col = db["products"]
 orders_col = db["orders"]
 tickets_col = db["tickets"]
 events_col = db["conversation_events"]
+
+
+async def init_indexes():
+    await events_col.create_index("conversation_id")
+    await events_col.create_index([("conversation_id", 1), ("created_at", 1)])
+    await events_col.create_index("event_type")
