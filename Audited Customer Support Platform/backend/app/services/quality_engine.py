@@ -1,9 +1,11 @@
+from app.db import events_col
 from app.models.event import ConversationEvent
 from app.services.event_logger import log_event
 from app.services.ccs_detector import detect_ccs
 from app.services.false_positive import detect_false_positive
 from app.services.irr_detector import calculate_irr
-from app.db import events_col
+from app.services.catastrophic_detector import detect_catastrophic_failure
+from app.services.recovery_detector import detect_recovery
 
 
 async def event_exists(conversation_id: str, event_type: str) -> bool:
@@ -29,6 +31,8 @@ async def run_quality_checks(conversation_id: str):
             )
 
     # FALSE POSITIVE 
+    false_positive = False
+
     if not await event_exists(conversation_id, "FALSE_POSITIVE_DETECTED"):
         false_positive = await detect_false_positive(conversation_id)
 
@@ -41,9 +45,12 @@ async def run_quality_checks(conversation_id: str):
                 )
             )
     else:
-        false_positive = True  # If already detected earlier
+        false_positive = True
+
 
     # IRR 
+
+    
     if not await event_exists(conversation_id, "IRR_ESTIMATED"):
         irr = await calculate_irr(conversation_id)
 
@@ -55,9 +62,34 @@ async def run_quality_checks(conversation_id: str):
             )
         )
     else:
-        irr = 0.0  # fallback, safe
+        irr_event = await events_col.find_one({
+            "conversation_id": conversation_id,
+            "event_type": "IRR_ESTIMATED"
+        })
+        irr = irr_event["payload"].get("irr", 0)
 
-    # TRAINING EXCLUSION 
+    catastrophic = await detect_catastrophic_failure(conversation_id)
+
+    if catastrophic and not await event_exists(conversation_id, "CATASTROPHIC_FAILURE"):
+        await log_event(
+            ConversationEvent(
+                conversation_id=conversation_id,
+                event_type= "CATASTROPHIC_FAILURE",
+                payload={"severity": "critical"}
+            )
+        )
+
+    recovered = await detect_recovery(conversation_id)
+
+    if recovered and not await event_exists(conversation_id, "RECOVERY_SUCCESS"):
+        await log_event(
+            ConversationEvent(
+                conversation_id=conversation_id,
+                event_type="RECOVERY_SUCCESS",
+                payload={"reward": True}
+            )
+        )
+
     if (false_positive or irr > 0.5) and not await event_exists(
         conversation_id, "EXCLUDE_FROM_TRAINING"
     ):

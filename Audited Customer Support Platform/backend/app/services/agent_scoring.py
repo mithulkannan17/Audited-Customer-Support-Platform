@@ -5,6 +5,7 @@ CCS_PENALTY = 5
 FALSE_CONFIDENCE_PENALTY  = 8
 IRR_COST_WEIGHT = 12
 RECOVERY_BONUS = 6
+CATASTROPHIC_PENALTY = 40
 
 async def calculate_agent_score(agent_id: str):
 
@@ -17,6 +18,7 @@ async def calculate_agent_score(agent_id: str):
     false_confidence = 0
     irr_prenalty = 0
     recovery = 0
+    catastrophic = 0
 
     async for event in cursor:
 
@@ -38,12 +40,16 @@ async def calculate_agent_score(agent_id: str):
         if event_type == "RECOVERY_SUCCESS":
             recovery += 1
 
+        if event_type == "CATASTROPHIC_FAILURE":
+            catastrophic += 1
+
     score = (
         successes * SUCCESS_WEIGHT
         - ccs_count * CCS_PENALTY
         - false_confidence * FALSE_CONFIDENCE_PENALTY
         - irr_prenalty * IRR_COST_WEIGHT
         + recovery * RECOVERY_BONUS
+        - catastrophic * CATASTROPHIC_PENALTY
     )
 
     return {
@@ -52,5 +58,6 @@ async def calculate_agent_score(agent_id: str):
         "successes": successes,
         "ccs": ccs_count,
         "false_confidence": false_confidence,
-        "recovery": recovery
+        "recovery": recovery,
+        "catastrophic_failures": catastrophic
     }
