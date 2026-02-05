@@ -33,7 +33,7 @@ async def close_ticket(ticket_id: str):
         ConversationEvent(
             conversation_id=ticket_id,
             event_type="TICKET_PROVISIONALLY_RESOLVED",
-            payload={}
+            payload={"agent_id": "agent_v1"}
         )
     )
 
