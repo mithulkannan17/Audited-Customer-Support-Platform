@@ -43,3 +43,19 @@ async def close_ticket(ticket_id: str):
     return {"status": "provisionally_resolved"}
 
 
+@router.post("/tickets/{ticket_id}reopen")
+async def reopen_ticket(ticket_id: str):
+    await tickets_col.update_one(
+        {"id": ticket_id},
+        {"$set": {"status": "REOPENED"}}
+    )
+
+    await log_event(
+        ConversationEvent(
+            Conversation_id=ticket_id,
+            event_type="TICKET_REOPENED",
+            payload={}
+        )
+    )
+
+    return {"status": "reopened"}
