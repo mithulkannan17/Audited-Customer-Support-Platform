@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.db import tickets_col
 from app.models.ticket import SupportTicket
 from app.models.event import ConversationEvent
 from app.services.event_logger import log_event
 from app.services.quality_engine import run_quality_checks
+from app.security.dependencies import require_role
+from app.security.roles import Role
 
 router = APIRouter()
 
@@ -26,7 +28,10 @@ async def create_ticket(ticket: SupportTicket):
 
 
 @router.post("/tickets/{ticket_id}/close")
-async def close_ticket(ticket_id: str):
+async def close_ticket(
+    ticket_id: str,
+    role=Depends(require_role(Role.AGENT))
+):
 
     result = await tickets_col.update_one(
         {"id": ticket_id},
@@ -50,7 +55,10 @@ async def close_ticket(ticket_id: str):
 
 
 @router.post("/tickets/{ticket_id}/reopen")
-async def reopen_ticket(ticket_id: str):
+async def reopen_ticket(
+    ticket_id: str,
+    role=Depends(require_role(Role.CUSTOMER))
+):
 
     result = await tickets_col.update_one(
         {"id": ticket_id},

@@ -1,18 +1,24 @@
 const BASE_URL = "http://127.0.0.1:8000/api/v1";
+const ROLE = "admin";
 
 export async function fetchGovernanceSummary() {
-    const res = await fetch(`${BASE_URL}/analytics/governance-summary`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch governance summary");
-    }
-    return res.json();
+    return apiFetch(`${BASE_URL}/analytics/governance-summary`);
 }
 
 export async function fetchAgentLeaderboard() {
-    const res = await fetch(`${BASE_URL}/analytics/leaderboard`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch agent leaderboard");
-    }
-    return res.json();
+    return apiFetch(`${BASE_URL}/analytics/leaderboard`);
 }
 
+export async function apiFetch(url: string) {
+    const res = await fetch(url, {
+        headers: {
+            "x-role": ROLE,
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error("API error");
+    }
+
+    return res.json();
+}

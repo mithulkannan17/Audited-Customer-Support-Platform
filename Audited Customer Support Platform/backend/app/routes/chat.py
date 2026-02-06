@@ -2,6 +2,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.event_logger import log_event
 from app.models.event import ConversationEvent
 from datetime import datetime
+from app.security.roles import Role
+from fastapi import WebSocketException
 
 router = APIRouter()
 AGENT_ID = "agent_v1"
@@ -9,6 +11,10 @@ AGENT_ID = "agent_v1"
 
 @router.websocket("/ws/chat/{ticket_id}")
 async def chat_socket(websocket: WebSocket, ticket_id: str):
+    role = websocket.headers.get("x-role")
+
+    if role not in [Role.CUSTOMER.value, Role.AGENT.value]:
+        raise WebSocketException(code=1008)
     await websocket.accept()
 
     try:
