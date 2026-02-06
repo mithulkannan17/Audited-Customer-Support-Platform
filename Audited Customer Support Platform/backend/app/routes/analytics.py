@@ -17,3 +17,48 @@ async def agent_failures(agent_id: str):
 @router.get("/analytics/governance-summary")
 async def summary():
     return await governance_summary()
+
+@router.get("/analytics/risk-trends")
+async def risk_trends():
+    from app.db import events_col
+
+    pipeline = [
+        {
+            "$match": {
+                "event_type": {
+                    "$in": [
+                        "CATASTROPHIC_FAILURE",
+                        "FALSE_POSITIVE_DETECTED",
+                        "TICKET_REOPENED"
+                    ]
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "day": {
+                        "$dateToString": {
+                            "format": "%Y-%m-%d",
+                            "date": "$create_at"
+                        }
+                    },
+                    "type": "$event_type"
+                },
+                "count": {"$sum": 1}
+            }
+        },
+        {
+            "$sort": {"_id.day": 1}
+        }
+    ]
+
+    results = []
+    async for r in events_col.aggregate(pipeline):
+        results.append({
+            "day": r["_id"]["day"],
+            "event_type": r["id"]["type"],
+            "count": r["count"]
+        })
+
+    return results
