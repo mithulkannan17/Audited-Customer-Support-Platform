@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from app.routes import products, tickets, orders, chat, agents, analytics
 from dotenv import load_dotenv
@@ -6,6 +7,14 @@ from app.db import init_indexes
 
 load_dotenv()
 app = FastAPI(title="AI Audited Support Platform")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():

@@ -1,0 +1,31 @@
+.card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 200px;
+}
+
+.title {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    letter-spacing: 0.03em;
+}
+
+.value {
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.neutral {
+    border-left: 4px solid var(--accent);
+}
+
+.danger {
+    border-left: 4px solid var(--danger);
+}
+
+.success {
+    border-left: 4px solid var(--success);
+}

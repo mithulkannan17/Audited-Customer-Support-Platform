@@ -1,0 +1,15 @@
+.topbar {
+    height: 52px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 14px;
+}
+
+.env {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
