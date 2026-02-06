@@ -3,10 +3,14 @@ from app.services.agent_scoring import calculate_agent_score
 
 async def get_all_agents():
 
-    agents_ids = await events_col.distinct("Payload.agent_id")
+    agent_ids = await events_col.distinct(
+    "payload.agent_id",
+    {"payload.agent_id": {"$exists": True}}
+)
+
 
     # Remove None or empty values
-    return [a for a in agents_ids if a]
+    return [a for a in agent_ids if a]
 
 async def generate_leaderboard():
 
@@ -34,7 +38,10 @@ async def failure_breakdown(agent_id: str):
 
     results = []
     async for r in events_col.aggregate(pipeline):
-        results.append(r)
+        results.append({
+            "event_type": r["_id"],
+            "count": r["count"]
+        })
 
     return results
 

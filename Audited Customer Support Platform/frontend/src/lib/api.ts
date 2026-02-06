@@ -7,3 +7,12 @@ export async function fetchGovernanceSummary() {
     }
     return res.json();
 }
+
+export async function fetchAgentLeaderboard() {
+    const res = await fetch(`${BASE_URL}/analytics/leaderboard`);
+    if (!res.ok) {
+        throw new Error("Failed to fetch agent leaderboard");
+    }
+    return res.json();
+}
+

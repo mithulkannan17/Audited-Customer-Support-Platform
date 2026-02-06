@@ -1,0 +1,53 @@
+.wrapper {
+    margin-top: 40px;
+}
+
+.heading {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 13px;
+}
+
+th {
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+}
+
+tr {
+    border-bottom: 1px solid var(--border);
+}
+
+tr:last-child {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.danger {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.success {
+    color: var(--success);
+    font-weight: 600;
+}

@@ -1,4 +1,5 @@
 import GovernanceSummary from "../components/GovernanceSummary";
+import AgentLeaderboard from "../components/AgentLeaderboarder";
 import styles from "./Dashboard.module.css";
 
 export default function Dashboard() {
@@ -10,6 +11,9 @@ export default function Dashboard() {
       </p>
 
       <GovernanceSummary />
+      <AgentLeaderboard />
     </div>
   );
 }
+
+
